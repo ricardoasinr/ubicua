@@ -14,68 +14,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // bool _openDoor = false;
   final db = FirebaseFirestore.instance;
-
-  Future<void> createData() async {
-    await db.collection('doors').add({
-      'statusDoor': true,
-      'lastUpdate': DateTime.now(),
-    });
-  }
-
-  Future<void> createData2() async {
-    await db.collection('doors').add(mapCreateDoor(
-          statusDoor: true,
-          lastUpdate: DateTime.now(),
-        ));
-  }
-
-  // void getStatusDoor() async {
-  //   var response =
-  //       await db.collection('doors').doc("OCJtX1n28YrORFdmaoTD").get();
-
-  //   bool result = response.data()!["statusDoor"];
-
-  //   setState(() {
-  //     _openDoor = !result;
-  //   });
-  // }
-
-  Future<void> openDoor() async {
-    await db
-        .collection('doors')
-        .doc("OCJtX1n28YrORFdmaoTD")
-        .set(mapCreateDoor(
-          statusDoor: true,
-          lastUpdate: DateTime.now(),
-        ))
-        .then((value) => log("Successfully! Door is open"),
-            onError: (e) => log("Error: $e"));
-    ;
-  }
-
-  Future<void> closeDoor() async {
-    await db
-        .collection('doors')
-        .doc("OCJtX1n28YrORFdmaoTD")
-        .set(mapCreateDoor(
-          statusDoor: false,
-          lastUpdate: DateTime.now(),
-        ))
-        .then((value) => log("Successfully! Door is closed"),
-            onError: (e) => log("Error: $e"));
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
-
     super.initState();
-    // getStatusDoor();
   }
-
-  //OCJtX1n28YrORFdmaoTD
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: Icon(
-                      // document!["statusDoor"]
                       document?["statusDoor"] ?? false
                           ? Icons.door_sliding_outlined
                           : Icons.door_back_door,
@@ -116,13 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () async {
                         if ((document?["statusDoor"] ?? false) == true) {
                           setState(() {
-                            // _openDoor = false;
-                            closeDoor();
+                            closeDoor(db);
                           });
                         } else {
                           setState(() {
-                            // _openDoor = true;
-                            openDoor();
+                            openDoor(db);
                           });
                         }
                       },
