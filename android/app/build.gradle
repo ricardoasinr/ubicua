@@ -26,6 +26,8 @@ android {
     namespace "com.example.open_dors"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+  
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,10 +47,12 @@ android {
         applicationId "com.example.open_dors"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+      
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        minSdkVersion 19
+        targetSdkVersion 33
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -64,4 +68,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
+}
