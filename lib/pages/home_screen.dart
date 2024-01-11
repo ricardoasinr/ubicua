@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:open_dors/models/door.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -84,36 +85,52 @@ class _MyHomePageState extends State<MyHomePage> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(30.0),
-              child: Icon(
-                _openDoor ? Icons.door_back_door : Icons.door_sliding_outlined,
-                size: 290,
-                color: Colors.brown,
+      body: StreamBuilder<DocumentSnapshot>(
+          stream:
+              db.collection('doors').doc('OCJtX1n28YrORFdmaoTD').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return CircularProgressIndicator();
+            }
+
+            var document = snapshot.data;
+            print(document!["statusDoor"]);
+
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Icon(
+                      // document!["statusDoor"]
+                      _openDoor
+                          ? Icons.door_back_door
+                          : Icons.door_sliding_outlined,
+                      size: 290,
+                      color: Colors.brown,
+                    ),
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (_openDoor == true) {
+                          setState(() {
+                            _openDoor = false;
+                          });
+                          openDoor();
+                        } else {
+                          setState(() {
+                            _openDoor = true;
+                          });
+                          closeDoor();
+                        }
+                      },
+                      child:
+                          Text(_openDoor ? "Open the door" : "Close the door"))
+                ],
               ),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  if (_openDoor == true) {
-                    setState(() {
-                      _openDoor = false;
-                      openDoor();
-                    });
-                  } else {
-                    setState(() {
-                      _openDoor = true;
-                      closeDoor();
-                    });
-                  }
-                },
-                child: Text(_openDoor ? "Open the door" : "Close the door"))
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 }
