@@ -7,3 +7,15 @@ class Door {
     required this.lastUpdate,
   });
 }
+
+Map<String, dynamic> mapCreateDoor({
+  bool? statusDoor,
+  DateTime? lastUpdate,
+}) {
+  final firestoreData = (<String, dynamic>{
+    'statusDoor': statusDoor,
+    'lastUpdate': lastUpdate,
+  });
+
+  return firestoreData;
+}

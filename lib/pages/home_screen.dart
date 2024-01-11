@@ -14,20 +14,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _openDoor = false;
+  // bool _openDoor = false;
   final db = FirebaseFirestore.instance;
-
-  Map<String, dynamic> mapCreateDoor({
-    bool? statusDoor,
-    DateTime? lastUpdate,
-  }) {
-    final firestoreData = (<String, dynamic>{
-      'statusDoor': statusDoor,
-      'lastUpdate': lastUpdate,
-    });
-
-    return firestoreData;
-  }
 
   Future<void> createData() async {
     await db.collection('doors').add({
@@ -36,33 +24,47 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void getStatusDoor() async {
-    var response =
-        await db.collection('doors').doc("OCJtX1n28YrORFdmaoTD").get();
-
-    bool result = response.data()!.values.first;
-
-    setState(() {
-      _openDoor = !result;
-    });
+  Future<void> createData2() async {
+    await db.collection('doors').add(mapCreateDoor(
+          statusDoor: true,
+          lastUpdate: DateTime.now(),
+        ));
   }
 
+  // void getStatusDoor() async {
+  //   var response =
+  //       await db.collection('doors').doc("OCJtX1n28YrORFdmaoTD").get();
+
+  //   bool result = response.data()!["statusDoor"];
+
+  //   setState(() {
+  //     _openDoor = !result;
+  //   });
+  // }
+
   Future<void> openDoor() async {
-    await db.collection('doors').doc("OCJtX1n28YrORFdmaoTD").set({
-      'statusDoor': true,
-      'lastUpdate': DateTime.now(),
-    }).then((value) => log("Successfully! Door is open"),
-        onError: (e) => log("Error: $e"));
+    await db
+        .collection('doors')
+        .doc("OCJtX1n28YrORFdmaoTD")
+        .set(mapCreateDoor(
+          statusDoor: true,
+          lastUpdate: DateTime.now(),
+        ))
+        .then((value) => log("Successfully! Door is open"),
+            onError: (e) => log("Error: $e"));
     ;
   }
 
   Future<void> closeDoor() async {
-    await db.collection('doors').doc("OCJtX1n28YrORFdmaoTD").set({
-      'statusDoor': false,
-      'lastUpdate': DateTime.now(),
-    }).then((value) => log("Successfully! Door is closed"),
-        onError: (e) => log("Error: $e"));
-    ;
+    await db
+        .collection('doors')
+        .doc("OCJtX1n28YrORFdmaoTD")
+        .set(mapCreateDoor(
+          statusDoor: false,
+          lastUpdate: DateTime.now(),
+        ))
+        .then((value) => log("Successfully! Door is closed"),
+            onError: (e) => log("Error: $e"));
   }
 
   @override
@@ -70,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
 
     super.initState();
-    getStatusDoor();
+    // getStatusDoor();
   }
 
   //OCJtX1n28YrORFdmaoTD
@@ -90,11 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
               db.collection('doors').doc('OCJtX1n28YrORFdmaoTD').snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
 
             var document = snapshot.data;
-            print(document!["statusDoor"]);
 
             return Center(
               child: Column(
@@ -104,29 +105,30 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.all(30.0),
                     child: Icon(
                       // document!["statusDoor"]
-                      _openDoor
-                          ? Icons.door_back_door
-                          : Icons.door_sliding_outlined,
+                      document?["statusDoor"] ?? false
+                          ? Icons.door_sliding_outlined
+                          : Icons.door_back_door,
                       size: 290,
                       color: Colors.brown,
                     ),
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                        if (_openDoor == true) {
+                        if ((document?["statusDoor"] ?? false) == true) {
                           setState(() {
-                            _openDoor = false;
+                            // _openDoor = false;
+                            closeDoor();
                           });
-                          openDoor();
                         } else {
                           setState(() {
-                            _openDoor = true;
+                            // _openDoor = true;
+                            openDoor();
                           });
-                          closeDoor();
                         }
                       },
-                      child:
-                          Text(_openDoor ? "Open the door" : "Close the door"))
+                      child: Text(document?["statusDoor"] ?? false
+                          ? "Close the door"
+                          : "Open the door"))
                 ],
               ),
             );
